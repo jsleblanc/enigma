@@ -24,6 +24,10 @@ singleCharacterProperty c = do
   let (b,_) = encode sut a
   c == b
   
+singleCharacterNeverEncodesToItselfProperty :: Char -> Bool
+singleCharacterNeverEncodesToItselfProperty c = do
+  let (a,_) = encode sut c
+  c /= a
 
 main :: IO ()
 main = defaultMain tests
@@ -41,5 +45,6 @@ unitTests = testGroup "Unit tests"
 
 qcProps = testGroup "(checked by QuickCheck)"
   [ 
-    QC.testProperty "singleCharacterTest" $ QC.forAll (elements ['A'..'Z']) $ \c -> singleCharacterProperty c
+      QC.testProperty "singleCharacterTest" $ QC.forAll (elements ['A'..'Z']) $ \c -> singleCharacterProperty c
+    , QC.testProperty "singleCharacterNeverEncodesToItselfProperty" $ QC.forAll (elements ['A'..'Z']) $ \c -> singleCharacterNeverEncodesToItselfProperty c
   ]
