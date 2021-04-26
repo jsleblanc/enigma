@@ -2,7 +2,7 @@ module Lib
     (
       Enigma,
       createEnigma,
-      encode      
+      encode
     ) where
 
 import Data.List
@@ -77,28 +77,27 @@ createEnigma rs rf = Enigma {
   alphabet = createAlphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 }
 
-substitute :: (LetterMapping a, LetterMapping b) => a -> b -> Char -> Char
-substitute lm1 lm2 c = lookupLetter lm2 (lookupPosition lm1 c)
+substitute :: (LetterMapping a, LetterMapping b) => a -> Char -> b -> Char
+substitute lm1 c lm2 = lookupLetter lm2 (lookupPosition lm1 c)
 
 
-  
 
 encode :: Enigma -> Char -> IO ()
 encode e c = do
   let a = alphabet e
   let r = rotors e
   let rf = reflector e
-  let p1 = substitute a (r !! 0) c
+  let p1 = substitute a c (r !! 0)
   putChar p1
-  let p2 = substitute a (r !! 1) p1
+  let p2 = substitute a p1 (r !! 1)
   putChar p2
-  let p3 = substitute a (r !! 2) p2
+  let p3 = substitute a p2 (r !! 2)
   putChar p3
-  let p4 = substitute a rf p3
+  let p4 = substitute a p3 rf
   putChar p4
-  let p5 = substitute (r !! 2) a p4
+  let p5 = substitute (r !! 2) p4 a
   putChar p5
-  let p6 = substitute (r !! 1) a p5
+  let p6 = substitute (r !! 1) p5 a
   putChar p6
-  let p7 = substitute (r !! 0) a p6
+  let p7 = substitute (r !! 0) p6 a
   putChar p7
