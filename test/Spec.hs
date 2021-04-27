@@ -12,6 +12,14 @@ sut = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","E
 genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']
 
+genAlphabetString :: Gen String
+genAlphabetString = listOf genAlphabetChar
+
+newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String} deriving Show
+
+instance Arbitrary AlphabetString where
+  arbitrary = AlphabetString <$> genAlphabetString
+
 singleCharacterTest :: Assertion
 singleCharacterTest = do
   let c = 'A'

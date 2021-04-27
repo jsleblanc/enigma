@@ -2,10 +2,16 @@ module Main where
 
 import Lib
 import Data.List
+import Control.Monad.State (State, get, put, modify, evalState, runState)
+
 
 e :: Enigma
 e = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 
+main :: IO ()
+main = do
+  let res = evalState (encode "AAAA") e
+  print res
 
 
 
@@ -175,7 +181,3 @@ const rotorTable = [
 
 -}
 
-
-main :: IO ()
-main = do
-  putStrLn "hello!"

@@ -5,6 +5,8 @@ module Lib
       encode
     ) where
 
+import Control.Monad (mapM)
+import Control.Monad.State (State, get, put, modify, evalState, runState)
 import Data.List
 
 class LetterMapping a where
@@ -91,7 +93,14 @@ cipher e c = do
   let bw = foldl reverseSubstitution reflected (reverse r)
   bw
 
-encode :: Enigma -> Char -> (Char, Enigma)
-encode e c = do
+encodeChar :: Char -> State Enigma Char
+encodeChar c = do
+  e <- get
   let encoded = cipher e c
-  (encoded, e)
+  put e
+  return encoded
+
+encode :: String -> State Enigma String
+encode s = do
+  encoded <- mapM encodeChar s
+  return encoded

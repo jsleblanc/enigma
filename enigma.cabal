@@ -34,6 +34,8 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , mtl
+    , containers
   default-language: Haskell2010
 
 executable enigma-exe
@@ -46,6 +48,7 @@ executable enigma-exe
   build-depends:
       base >=4.7 && <5
     , enigma
+    , mtl
   default-language: Haskell2010
 
 test-suite enigma-test
