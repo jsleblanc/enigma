@@ -26,8 +26,8 @@ instance LetterMapping Rotor where
         Just p -> p
         Nothing -> error "fail"
 
-rotate :: Rotor -> Rotor
-rotate r = r { wiring = tail w ++ [head w], position = p + 1 }
+rotateL :: Rotor -> Rotor
+rotateL r = r { wiring = tail w ++ [head w], position = p + 1 }
   where
     w = wiring r
     p = position r
@@ -101,7 +101,7 @@ cipher e c = do
 doRotation :: Enigma -> Enigma
 doRotation e = do
   let (r:rs) = rotors e
-  let rp = rotate r
+  let rp = rotateL r
   e {
     rotors = rp:rs
   }
@@ -109,17 +109,18 @@ doRotation e = do
 encodeChar :: Char -> State Enigma Char
 encodeChar c = do
   e <- get
-  let re = doRotation e
+  let re = doRotation e 
   let encoded = cipher re c
   put re
-  let x = traceShowId re
+  get >>= traceShowM
   return encoded
 
 encodeST :: String -> State Enigma String
 encodeST s = do
+  get >>= traceShowM
   encoded <- mapM encodeChar s
   return encoded
-  
+
 encode :: Enigma -> String -> String
 encode e s = do
   evalState (encodeST s) e
