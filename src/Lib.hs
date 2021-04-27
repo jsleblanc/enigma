@@ -8,6 +8,7 @@ module Lib
 import Control.Monad (mapM)
 import Control.Monad.State (State, get, put, modify, evalState, runState)
 import Data.List
+import Debug.Trace
 
 class LetterMapping a where
   lookupLetter :: a -> Int -> Char
@@ -111,9 +112,14 @@ encodeChar c = do
   let re = doRotation e
   let encoded = cipher re c
   put re
+  let x = traceShowId re
   return encoded
 
-encode :: String -> State Enigma String
-encode s = do
+encodeST :: String -> State Enigma String
+encodeST s = do
   encoded <- mapM encodeChar s
   return encoded
+  
+encode :: Enigma -> String -> String
+encode e s = do
+  evalState (encodeST s) e

@@ -2,15 +2,13 @@ module Main where
 
 import Lib
 import Data.List
-import Control.Monad.State (State, get, put, modify, evalState, runState)
-
 
 e :: Enigma
 e = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 
 main :: IO ()
 main = do
-  let res = evalState (encode "AAA") e
+  let res = encode e "AAA"
   print res
 
 
