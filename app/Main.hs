@@ -10,41 +10,9 @@ e = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","EKM
 
 main :: IO ()
 main = do
-  let res = evalState (encode "AAAA") e
+  let res = evalState (encode "AAA") e
   print res
 
-
-
-{-
-r1 :: Rotor
-r1 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-
-r2 :: Rotor
-r2 = createRotor "AJDKSIRUXBLHWTMCQGZNPYFVOE"
-
-r3 :: Rotor
-r3 = createRotor "BDFHJLCPRTXVZNYEIWGAKMUSQO"
-
-reflector2 :: Reflector
-reflector2 = createReflector "YRUHQSLDPXNGOKMIEBFZCWVJAT"
-
-encode :: Char -> IO ()
-encode s = do
-  let p1 = lookupLetter (lookupPosition s reference) r3
-  putChar p1
-  let p2 = lookupLetter (lookupPosition p1 reference) r2
-  putChar p2
-  let p3 = lookupLetter (lookupPosition p2 reference) r1
-  putChar p3
-  let p4 = lookupLetter2 (lookupPosition p3 reference) reflector2
-  putChar p4
-  let p5 = lookupLetter (lookupPosition p4 r1) reference
-  putChar p5
-  let p6 = lookupLetter (lookupPosition p5 r2) reference
-  putChar p6
-  let p7 = lookupLetter (lookupPosition p6 r3) reference
-  putChar p7
--}
 
 {-
   ABCDEFGHIJKLMNOPQRSTUVWXYZ
@@ -70,6 +38,15 @@ AAAA -> UOTG
 R YRUHQSLDPXNGOKMIEBFZCWVJAT
 
 A -> B -> J -> Z -> T -> L -> K -> U
+
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  --------------------------
+1 EKMFLGDQVZNTOWYHXUSPAIBRCJ
+2 AJDKSIRUXBLHWTMCQGZNPYFVOE
+3 BDFHJLCPRTXVZNYEIWGAKMUSQO
+R YRUHQSLDPXNGOKMIEBFZCWVJAT
+
+A -> E -> S -> G -> L -> F -> W -> N
 
 -}
 

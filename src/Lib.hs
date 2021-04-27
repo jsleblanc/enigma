@@ -13,8 +13,9 @@ class LetterMapping a where
   lookupLetter :: a -> Int -> Char
   lookupPosition :: a -> Char -> Int
 
-newtype Rotor = Rotor {
-  wiring :: [Char]
+data Rotor = Rotor {
+  wiring :: [Char],
+  position :: Int
 } deriving Show
 
 instance LetterMapping Rotor where
@@ -25,8 +26,10 @@ instance LetterMapping Rotor where
         Nothing -> error "fail"
 
 rotate :: Rotor -> Rotor
-rotate r = Rotor { wiring = tail w ++ [head w]}
-  where w = wiring r
+rotate r = r { wiring = tail w ++ [head w], position = p + 1 }
+  where
+    w = wiring r
+    p = position r
 
 
 newtype Reflector = Reflector {
@@ -59,7 +62,8 @@ data Enigma = Enigma {
 
 createRotor :: String -> Rotor
 createRotor s = Rotor {
-    wiring = s
+    wiring = s,
+    position = 1
 }
 
 createReflector :: String -> Reflector
@@ -93,11 +97,20 @@ cipher e c = do
   let bw = foldl reverseSubstitution reflected (reverse r)
   bw
 
+doRotation :: Enigma -> Enigma
+doRotation e = do
+  let (r:rs) = rotors e
+  let rp = rotate r
+  e {
+    rotors = rp:rs
+  }
+
 encodeChar :: Char -> State Enigma Char
 encodeChar c = do
   e <- get
-  let encoded = cipher e c
-  put e
+  let re = doRotation e
+  let encoded = cipher re c
+  put re
   return encoded
 
 encode :: String -> State Enigma String
