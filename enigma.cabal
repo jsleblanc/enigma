@@ -50,6 +50,7 @@ executable enigma-exe
       base >=4.7 && <5
     , enigma
     , mtl
+    , containers
   default-language: Haskell2010
 
 test-suite enigma-test

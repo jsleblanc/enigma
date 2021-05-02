@@ -1,109 +1,100 @@
-module Lib
-    (
-      Enigma,
-      createEnigma,
-      encode
-    ) where
+module Lib where
 
 import Control.Monad (mapM)
 import Control.Monad.State (State, get, put, modify, evalState, runState)
 import Data.List
+import qualified Data.Map as Map
 import Debug.Trace
+
+alphabetC :: String
+alphabetC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+swap :: (a,b) -> (b,a)
+swap (a,b) = (b,a)
+
+letterToPosition :: Char -> Int
+letterToPosition c =
+  case elemIndex c alphabetC of
+    Just i -> i
+    Nothing -> error "Letter is not part of the alphabet!"
+
+positionToLetter :: Int -> Char
+positionToLetter i = alphabetC !! i
+
+rotorFromStringMap :: String -> Rotor
+rotorFromStringMap s = r
+  where
+    indexedString = zip [0..] s
+    pairs = map (\(i,c) -> (i,letterToPosition c)) indexedString
+    r = Rotor {
+      wiring = Map.fromList pairs,
+      offset = 0
+    }
+
+data Rotor = Rotor {
+  wiring :: Map.Map Int Int,
+  offset :: Int
+} deriving Show
 
 class LetterMapping a where
   lookupLetter :: a -> Int -> Char
   lookupPosition :: a -> Char -> Int
 
-data Rotor = Rotor {
-  wiring :: [Char],
-  position :: Int
-} deriving Show
-
-instance LetterMapping Rotor where
-  lookupLetter r p = (wiring r) !! p
-  lookupPosition r l =
-    case elemIndex l (wiring r) of
-        Just p -> p
-        Nothing -> error "fail"
-
-rotateL :: Rotor -> Rotor
-rotateL r = r { wiring = tail w ++ [head w], position = p + 1 }
-  where
-    w = wiring r
-    p = position r
-
-
 newtype Reflector = Reflector {
   reflectedWiring :: [Char]
 } deriving Show
 
-instance LetterMapping Reflector where
-  lookupLetter r p = (reflectedWiring r) !! p
-  lookupPosition r l =
-    case elemIndex l (reflectedWiring r) of
-        Just p -> p
-        Nothing -> error "fail"
-
-newtype Alphabet = Alphabet {
-  reference :: [Char]
-} deriving Show
-
-instance LetterMapping Alphabet where
-  lookupLetter r p = (reference r) !! p
-  lookupPosition r l =
-    case elemIndex l (reference r) of
-        Just p -> p
-        Nothing -> error "fail"
-
 data Enigma = Enigma {
   rotors :: [Rotor],
-  reflector :: Reflector,
-  alphabet :: Alphabet
+  reflector :: Rotor
 } deriving Show
 
-createRotor :: String -> Rotor
-createRotor s = Rotor {
-    wiring = s,
-    position = 1
-}
-
-createReflector :: String -> Reflector
-createReflector s = Reflector {
-  reflectedWiring = s
-}
-
-createAlphabet :: String -> Alphabet
-createAlphabet s = Alphabet {
-  reference = s
-}
-
+-- Rotors are left-to-right order
 createEnigma :: [String] -> String -> Enigma
 createEnigma rs rf = Enigma {
-  rotors = map createRotor rs,
-  reflector = createReflector rf,
-  alphabet = createAlphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  rotors = map rotorFromStringMap rs,
+  reflector = rotorFromStringMap rf
 }
 
 substitute :: (LetterMapping a, LetterMapping b) => a -> Char -> b -> Char
 substitute lm1 c lm2 = lookupLetter lm2 (lookupPosition lm1 c)
 
+addWithRollover :: Int -> Int -> Int -> Int
+addWithRollover value inc max = do
+  let nv = value + inc
+  if nv < max then nv else nv - max
+
+cipherWithRotor :: Int -> Rotor -> Int
+cipherWithRotor p r = do
+  let o = offset r
+  let np = addWithRollover p o 26
+  case Map.lookup np (wiring r) of
+    Just i -> i
+    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+
+rotateRotor :: Rotor -> Rotor
+rotateRotor r = do
+  let o = offset r
+  r {
+    offset = addWithRollover o 1 26
+  }
+
 cipher :: Enigma -> Char -> Char
 cipher e c = do
-  let a = alphabet e
   let r = rotors e
-  let forwardSubstitution = substitute a
-  let reverseSubstitution ch lm = substitute lm ch a
-  let fw = foldl forwardSubstitution c r
-  let reflected = substitute a fw (reflector e)
-  let bw = foldl reverseSubstitution reflected (reverse r)
-  bw
+  let p = letterToPosition c
+  let fw = foldl cipherWithRotor p (reverse r)
+  let reflected = cipherWithRotor fw (reflector e)
+  let bw = foldl cipherWithRotor reflected r
+  positionToLetter bw
 
 doRotation :: Enigma -> Enigma
 doRotation e = do
-  let (r:rs) = rotors e
-  let rp = rotateL r
+  let r = rotors e
+  let l = rotateRotor (last r)
+  let i = init r
   e {
-    rotors = rp:rs
+    rotors = i ++ [l]
   }
 
 encodeChar :: Char -> State Enigma Char
