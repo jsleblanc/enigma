@@ -60,9 +60,10 @@ substitute :: (LetterMapping a, LetterMapping b) => a -> Char -> b -> Char
 substitute lm1 c lm2 = lookupLetter lm2 (lookupPosition lm1 c)
 
 addWithRollover :: Int -> Int -> Int -> Int
-addWithRollover value inc max = do
-  let nv = value + inc
-  if nv < max then nv else nv - max
+addWithRollover value offset max = do
+  let nv = value + offset
+  if nv < 0 then max - 1 else
+    if nv < max then nv else nv - max
 
 cipherWithRotor :: Int -> Rotor -> Int
 cipherWithRotor p r = do
@@ -83,7 +84,7 @@ cipher :: Enigma -> Char -> Char
 cipher e c = do
   let r = rotors e
   let p = letterToPosition c
-  let fw = foldl cipherWithRotor p (reverse r)
+  let fw = foldl cipherWithRotor p r
   let reflected = cipherWithRotor fw (reflector e)
   let bw = foldl cipherWithRotor reflected r
   positionToLetter bw
