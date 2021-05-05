@@ -73,6 +73,30 @@ cipherWithRotor p r = do
     Just i -> i
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
 
+cipherWithRotorRightToLeft :: Int -> Rotor -> Int
+cipherWithRotorRightToLeft p r = do
+  let o = offset r
+  let np = addWithRollover p o 26  
+  case Map.lookup np (wiring r) of
+    Just i -> i
+    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+
+keyFromValue :: Int -> Map.Map Int Int -> Maybe Int
+keyFromValue value m = do
+  let x = map fst $ filter ((== value) . snd) (Map.assocs m)
+  case x of
+    [key] -> Just key
+    [] -> Nothing
+
+cipherWithRotorLeftToRight :: Int -> Rotor -> Int
+cipherWithRotorLeftToRight p r = do
+  let o = offset r
+  let np = addWithRollover p o 26  
+  case keyFromValue np (wiring r) of
+    Just i -> i
+    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+
+
 rotateRotor :: Rotor -> Rotor
 rotateRotor r = do
   let o = offset r
@@ -86,7 +110,7 @@ cipher e c = do
   let p = letterToPosition c
   let fw = foldl cipherWithRotor p r
   let reflected = cipherWithRotor fw (reflector e)
-  let bw = foldl cipherWithRotor reflected r
+  let bw = foldl cipherWithRotor reflected (reverse r)
   positionToLetter bw
 
 doRotation :: Enigma -> Enigma
@@ -97,11 +121,17 @@ doRotation e = do
   e {
     rotors = i ++ [l]
   }
-
-encodeChar :: Char -> State Enigma Char
-encodeChar c = do
+{-
+doRotationST :: State Enigma ()
+doRotationST = do
   e <- get
-  let re = doRotation e 
+  let re = doRotation e
+  put re
+  return ()
+
+encodeChar :: State Enigma Char -> State Enigma Char
+encodeChar = do
+  re <- doRotationST
   let encoded = cipher re c
   put re
   get >>= traceShowM
@@ -112,7 +142,30 @@ encodeST s = do
   get >>= traceShowM
   encoded <- mapM encodeChar s
   return encoded
-
+-}
 encode :: Enigma -> String -> String
 encode e s = do
-  evalState (encodeST s) e
+  let re1 = doRotation e
+  let c1 = cipher re1 'A'
+  let re2 = doRotation re1
+  let c2 = cipher re2 'A'
+  let re3 = doRotation re2
+  let c3 = cipher re3 'A'
+  [c1,c2,c3]
+  -- evalState (encodeST s) e
+  -- "asdf"
+
+encodeIO :: Enigma -> String -> IO ()
+encodeIO e s = do
+  putStrLn (show e)
+  let re1 = doRotation e
+  let c1 = cipher re1 'A'
+  putStrLn (show re1)
+  let re2 = doRotation re1
+  let c2 = cipher re2 'A'
+  putStrLn (show re2)
+  let re3 = doRotation re2
+  let c3 = cipher re3 'A'
+  putStrLn (show re3)
+  let es = c1:c2:c3:[]
+  putStrLn es
