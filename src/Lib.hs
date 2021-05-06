@@ -1,4 +1,8 @@
-module Lib where
+module Lib (
+  Enigma,
+  createEnigma,
+  encode
+) where
 
 import Control.Monad (mapM)
 import Control.Monad.State (State, get, put, modify, evalState, runState)
