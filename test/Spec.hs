@@ -18,7 +18,7 @@ genAlphabetChar = elements ['A'..'Z']
 genAlphabetString :: Gen String
 genAlphabetString = listOf1 genAlphabetChar
 
-newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String} deriving Show
+newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String } deriving Show
 
 instance Arbitrary AlphabetString where
   arbitrary = AlphabetString <$> genAlphabetString
@@ -36,13 +36,13 @@ singleCharacterNeverEncodesToItselfProperty c = do
   let a = evalState (encode [c]) sut
   c /= head a
 
-encodedStringShouldNotBeOriginalStringProperty :: String -> Bool
-encodedStringShouldNotBeOriginalStringProperty s = do
+encodedStringShouldNotBeOriginalStringProperty :: AlphabetString -> Property
+encodedStringShouldNotBeOriginalStringProperty (AlphabetString s) = True ==> do
   let a = evalState (encode s) sut
   s /= a
 
-encodedStringShouldDecodeToItselfProperty :: String -> Bool
-encodedStringShouldDecodeToItselfProperty s = do
+encodedStringShouldDecodeToItselfProperty :: AlphabetString -> Property
+encodedStringShouldDecodeToItselfProperty (AlphabetString s) = True ==> do
   let a = evalState (encode s) sut
   let b = evalState (encode a) sut
   s == b
@@ -65,6 +65,6 @@ unitTests = testGroup "Unit tests"
 qcProps = testGroup "(checked by QuickCheck)"
   [
     QC.testProperty "singleCharacterNeverEncodesToItselfProperty" $ QC.forAll genAlphabetChar singleCharacterNeverEncodesToItselfProperty
-    , QC.testProperty "encodedStringShouldNotBeOriginalStringProperty" $ QC.forAll genAlphabetString encodedStringShouldNotBeOriginalStringProperty
-    , QC.testProperty "encodedStringShouldDecodeToItselfProperty" $ QC.forAll genAlphabetString encodedStringShouldDecodeToItselfProperty
+    , QC.testProperty "encodedStringShouldNotBeOriginalStringProperty" encodedStringShouldNotBeOriginalStringProperty
+    , QC.testProperty "encodedStringShouldDecodeToItselfProperty" encodedStringShouldDecodeToItselfProperty
   ]
