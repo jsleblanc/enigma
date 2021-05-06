@@ -36,14 +36,6 @@ data Rotor = Rotor {
   offset :: Int
 } deriving Show
 
-class LetterMapping a where
-  lookupLetter :: a -> Int -> Char
-  lookupPosition :: a -> Char -> Int
-
-newtype Reflector = Reflector {
-  reflectedWiring :: [Char]
-} deriving Show
-
 data Enigma = Enigma {
   rotors :: [Rotor],
   reflector :: Rotor
@@ -55,9 +47,6 @@ createEnigma rs rf = Enigma {
   rotors = map rotorFromStringMap rs,
   reflector = rotorFromStringMap rf
 }
-
-substitute :: (LetterMapping a, LetterMapping b) => a -> Char -> b -> Char
-substitute lm1 c lm2 = lookupLetter lm2 (lookupPosition lm1 c)
 
 addWithRollover :: Int -> Int -> Int -> Int
 addWithRollover value offset max = do
@@ -92,7 +81,6 @@ cipherWithRotorLeftToRight p r = do
   case keyFromValue np (wiring r) of
     Just i -> subtractWithRollover i o 26
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
-
 
 rotateRotor :: Rotor -> Rotor
 rotateRotor r = do

@@ -25,13 +25,13 @@ main = do
   putStrLn (show rfl)
   let c = 0
   let c1 = cipherWithRotorRightToLeft c r1
-  let c2 = cipherWithRotorRightToLeft (c1-o) r2
+  let c2 = cipherWithRotorRightToLeft (c1) r2
   let c3 = cipherWithRotorRightToLeft (c2) r3
   let c4 = cipherWithRotorRightToLeft (c3) rfl
   let c5 = cipherWithRotorLeftToRight (c4) r3
   let c6 = cipherWithRotorLeftToRight (c5) r2
   let c7 = cipherWithRotorLeftToRight (c6) r1
-  let c8 = c7-o
+  let c8 = c7
   putStrLn (show (c,c1,c2,c3,c4,c5,c6,c7,c8))
   putStrLn [(positionToLetter c8)]
   let res = encode e "AAA"
