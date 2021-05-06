@@ -11,7 +11,7 @@ e = createEnigma ["EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKM
 
 main :: IO ()
 main = do
-  let s = evalState (encode "AAAA") e
+  let s = evalState (encode "AAAAAAAAAAAAAAA") e
   putStrLn s
 
 {-

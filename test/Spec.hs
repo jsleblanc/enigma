@@ -12,6 +12,14 @@ sut = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","E
 enigmaAllRotor1 :: Enigma
 enigmaAllRotor1 = createEnigma ["EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 
+enigmaAllRotor1_StartFirstRotorAtZ :: Enigma
+enigmaAllRotor1_StartFirstRotorAtZ = createEnigmaWithRotors [r3, r2, r1] rfl
+  where
+    r1 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 0
+    r2 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 0
+    r3 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 25
+    rfl = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
+
 genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']
 
@@ -29,10 +37,15 @@ instance Arbitrary AlphabetString where
 
 cipheredExample_1_Test :: Assertion
 cipheredExample_1_Test = do
-  let result = evalState (encode "AAAA") enigmaAllRotor1
-  assertEqual "Example did not encode to expected value" result "UOTG"
+  let sut = enigmaAllRotor1
+  let result = evalState (encode "AAAAAAAAAAAAAAA") sut
+  assertEqual "Example did not encode to expected value" "UOTGRLFGERCPELT" result
 
-
+cipheredExample_2_Test :: Assertion
+cipheredExample_2_Test = do
+  let sut = enigmaAllRotor1_StartFirstRotorAtZ
+  let result = evalState (encode "AAAAAAAAAAAAAAA") sut
+  assertEqual "Example did not encode to expected value" "JUOTGRLFGERCPEL" result
 
 
 singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
@@ -63,12 +76,13 @@ properties = testGroup "Properties" [qcProps]
 
 unitTests = testGroup "Unit tests"
   [
-    testCase "cipheredExample_1_Test" cipheredExample_1_Test
+      testCase "cipheredExample_1_Test" cipheredExample_1_Test
+    , testCase "cipheredExample_2_Test" cipheredExample_2_Test
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"
   [
-    QC.testProperty "singleCharacterNeverEncodesToItselfProperty" singleCharacterNeverEncodesToItselfProperty
+      QC.testProperty "singleCharacterNeverEncodesToItselfProperty" singleCharacterNeverEncodesToItselfProperty
     , QC.testProperty "encodedStringShouldNotBeOriginalStringProperty" encodedStringShouldNotBeOriginalStringProperty
     , QC.testProperty "encodedStringShouldDecodeToItselfProperty" encodedStringShouldDecodeToItselfProperty
   ]

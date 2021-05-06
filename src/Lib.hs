@@ -51,7 +51,7 @@ data Enigma = Enigma {
   reflector :: Rotor
 } deriving Show
 
--- Rotors are right-to-left order; rightmost position is 1, reflector is in the left-most position
+-- Put Rotors in right-to-left order; rightmost position is 1, leftmost is 3 (or 4), reflector is in the left-most position
 createEnigma :: [String] -> String -> Enigma
 createEnigma rs rf =
   createEnigmaWithRotors rotors reflector
