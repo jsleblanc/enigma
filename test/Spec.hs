@@ -16,7 +16,7 @@ genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']
 
 genAlphabetString :: Gen String
-genAlphabetString = listOf genAlphabetChar
+genAlphabetString = listOf1 genAlphabetChar
 
 newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String} deriving Show
 
