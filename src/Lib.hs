@@ -49,7 +49,7 @@ data Enigma = Enigma {
   reflector :: Rotor
 } deriving Show
 
--- Rotors are left-to-right order
+-- Rotors are right-to-left order; rightmost position is 1, reflector is in the left-most position
 createEnigma :: [String] -> String -> Enigma
 createEnigma rs rf = Enigma {
   rotors = map rotorFromStringMap rs,
@@ -112,11 +112,10 @@ cipher e c = do
 
 doRotation :: Enigma -> Enigma
 doRotation e = do
-  let r = rotors e
-  let l = rotateRotor (last r)
-  let i = init r
+  let (r:rs) = rotors e
+  let l = rotateRotor r
   e {
-    rotors = i ++ [l]
+    rotors = l:rs
   }
 {-
 doRotationST :: State Enigma ()
