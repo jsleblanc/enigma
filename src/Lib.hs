@@ -1,6 +1,9 @@
 module Lib (
+  Rotor,
   Enigma,
+  createRotor,
   createEnigma,
+  createEnigmaWithRotors,
   encode
 ) where
 
@@ -22,6 +25,10 @@ letterToPosition c =
 positionToLetter :: Int -> Char
 positionToLetter i = alphabetC !! i
 
+createRotor :: String -> Offset -> Rotor
+createRotor ws os = r { offset = os }
+  where r = rotorFromStringMap ws
+
 rotorFromStringMap :: String -> Rotor
 rotorFromStringMap s = r
   where
@@ -32,9 +39,11 @@ rotorFromStringMap s = r
       offset = 0
     }
 
+type Offset = Int
+
 data Rotor = Rotor {
   wiring :: Map.Map Int Int,
-  offset :: Int
+  offset :: Offset
 } deriving Show
 
 data Enigma = Enigma {
@@ -44,18 +53,25 @@ data Enigma = Enigma {
 
 -- Rotors are right-to-left order; rightmost position is 1, reflector is in the left-most position
 createEnigma :: [String] -> String -> Enigma
-createEnigma rs rf = Enigma {
-  rotors = map rotorFromStringMap rs,
-  reflector = rotorFromStringMap rf
+createEnigma rs rf =
+  createEnigmaWithRotors rotors reflector
+  where
+    rotors = map rotorFromStringMap rs
+    reflector = rotorFromStringMap rf
+
+createEnigmaWithRotors :: [Rotor] -> Rotor -> Enigma
+createEnigmaWithRotors rs rf = Enigma {
+  rotors = rs,
+  reflector = rf
 }
 
-addWithRollover :: Int -> Int -> Int -> Int
+addWithRollover :: Int -> Offset -> Int -> Int
 addWithRollover value offset max = do
   let nv = value + offset
   if nv < 0 then max - 1 else
     if nv < max then nv else nv - max
 
-subtractWithRollover :: Int -> Int -> Int -> Int
+subtractWithRollover :: Int -> Offset -> Int -> Int
 subtractWithRollover value offset max = do
   let nv = value - offset
   if nv < 0 then max - (0 - nv) else nv

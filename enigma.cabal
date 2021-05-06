@@ -64,6 +64,7 @@ test-suite enigma-test
   build-depends:
       base >=4.7 && <5
     , enigma
+    , mtl
     , test-framework
     , test-framework-hunit
     , HUnit

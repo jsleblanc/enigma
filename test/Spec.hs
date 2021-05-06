@@ -1,5 +1,5 @@
 import Data.Monoid
-import Control.Monad
+import Control.Monad.State
 -- import Utils
 import Test.Tasty
 import Test.Tasty.QuickCheck as QC
@@ -23,33 +23,30 @@ newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String} derivi
 instance Arbitrary AlphabetString where
   arbitrary = AlphabetString <$> genAlphabetString
 
-singleCharacterTest :: Assertion
-singleCharacterTest = do
-  let c = "A"
-  let b = singleCharacterProperty c
-  assertBool "Encoded character should decode to original starting character" b
+cipheredExample_1_Test :: Assertion
+cipheredExample_1_Test = do
+  let result = evalState (encode "AAAA") enigmaAllRotor1
+  assertEqual "Example did not encode to expected value" result "UOTG"
 
-singleCharacterProperty :: String -> Bool
-singleCharacterProperty c = do
-  let a = encode sut c
-  let b = encode sut a
-  c == b
 
-singleCharacterNeverEncodesToItselfProperty :: String -> Bool
+
+
+singleCharacterNeverEncodesToItselfProperty :: Char -> Bool
 singleCharacterNeverEncodesToItselfProperty c = do
-  let a = encode sut c
-  c /= a
+  let a = evalState (encode [c]) sut
+  c /= head a
 
 encodedStringShouldNotBeOriginalStringProperty :: String -> Bool
 encodedStringShouldNotBeOriginalStringProperty s = do
-  let a = encode sut s
+  let a = evalState (encode s) sut
   s /= a
 
 encodedStringShouldDecodeToItselfProperty :: String -> Bool
 encodedStringShouldDecodeToItselfProperty s = do
-  let a = encode sut s
-  let b = encode sut a
+  let a = evalState (encode s) sut
+  let b = evalState (encode a) sut
   s == b
+
 
 main :: IO ()
 main = defaultMain tests
@@ -62,13 +59,12 @@ properties = testGroup "Properties" [qcProps]
 
 unitTests = testGroup "Unit tests"
   [
-    testCase "singleCharacterTest" singleCharacterTest
+    testCase "cipheredExample_1_Test" cipheredExample_1_Test
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"
   [
-      QC.testProperty "singleCharacterTest" $ QC.forAll (elements ['A'..'Z']) $ \c -> singleCharacterProperty [c]
-    , QC.testProperty "singleCharacterNeverEncodesToItselfProperty" $ QC.forAll (elements ['A'..'Z']) $ \c -> singleCharacterNeverEncodesToItselfProperty [c]
+    QC.testProperty "singleCharacterNeverEncodesToItselfProperty" $ QC.forAll genAlphabetChar singleCharacterNeverEncodesToItselfProperty
     , QC.testProperty "encodedStringShouldNotBeOriginalStringProperty" $ QC.forAll genAlphabetString encodedStringShouldNotBeOriginalStringProperty
     , QC.testProperty "encodedStringShouldDecodeToItselfProperty" $ QC.forAll genAlphabetString encodedStringShouldDecodeToItselfProperty
   ]
