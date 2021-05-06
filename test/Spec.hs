@@ -18,7 +18,11 @@ genAlphabetChar = elements ['A'..'Z']
 genAlphabetString :: Gen String
 genAlphabetString = listOf1 genAlphabetChar
 
+newtype AlphabetChar = AlphabetChar { unwrapAlphabetChar :: Char } deriving Show
 newtype AlphabetString = AlphabetString { unwrapAlphabetString :: String } deriving Show
+
+instance Arbitrary AlphabetChar where
+  arbitrary = AlphabetChar <$> genAlphabetChar
 
 instance Arbitrary AlphabetString where
   arbitrary = AlphabetString <$> genAlphabetString
@@ -31,8 +35,8 @@ cipheredExample_1_Test = do
 
 
 
-singleCharacterNeverEncodesToItselfProperty :: Char -> Bool
-singleCharacterNeverEncodesToItselfProperty c = do
+singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
+singleCharacterNeverEncodesToItselfProperty (AlphabetChar c) = True ==> do
   let a = evalState (encode [c]) sut
   c /= head a
 
@@ -64,7 +68,7 @@ unitTests = testGroup "Unit tests"
 
 qcProps = testGroup "(checked by QuickCheck)"
   [
-    QC.testProperty "singleCharacterNeverEncodesToItselfProperty" $ QC.forAll genAlphabetChar singleCharacterNeverEncodesToItselfProperty
+    QC.testProperty "singleCharacterNeverEncodesToItselfProperty" singleCharacterNeverEncodesToItselfProperty
     , QC.testProperty "encodedStringShouldNotBeOriginalStringProperty" encodedStringShouldNotBeOriginalStringProperty
     , QC.testProperty "encodedStringShouldDecodeToItselfProperty" encodedStringShouldDecodeToItselfProperty
   ]
