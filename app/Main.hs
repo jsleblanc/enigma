@@ -1,5 +1,6 @@
 module Main where
 
+import Control.Monad.State
 import Lib
 import Data.List
 import qualified Data.Map as Map
@@ -34,8 +35,8 @@ main = do
   let c8 = c7
   putStrLn (show (c,c1,c2,c3,c4,c5,c6,c7,c8))
   putStrLn [(positionToLetter c8)]
-  let res = encode e "AAA"
-  print res
+  -- let res = encode e "AAA"
+  -- print res
 
 
 {-

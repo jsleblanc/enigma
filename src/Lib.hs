@@ -105,51 +105,16 @@ doRotation e = do
   e {
     rotors = l:rs
   }
-{-
-doRotationST :: State Enigma ()
-doRotationST = do
-  e <- get
-  let re = doRotation e
-  put re
-  return ()
 
-encodeChar :: State Enigma Char -> State Enigma Char
-encodeChar = do
-  re <- doRotationST
-  let encoded = cipher re c
-  put re
-  get >>= traceShowM
-  return encoded
+type EnigmaState = State Enigma
 
-encodeST :: String -> State Enigma String
-encodeST s = do
-  get >>= traceShowM
-  encoded <- mapM encodeChar s
-  return encoded
--}
-encode :: Enigma -> String -> String
-encode e s = do
-  let re1 = doRotation e
-  let c1 = cipher re1 'A'
-  let re2 = doRotation re1
-  let c2 = cipher re2 'A'
-  let re3 = doRotation re2
-  let c3 = cipher re3 'A'
-  [c1,c2,c3]
-  -- evalState (encodeST s) e
-  -- "asdf"
+encodeCharST :: Char -> EnigmaState Char
+encodeCharST c = do
+  enigmaState <- get
+  let rotatedEnigma = doRotation enigmaState
+  let encodedChar = cipher rotatedEnigma c
+  put rotatedEnigma
+  return encodedChar
 
-encodeIO :: Enigma -> String -> IO ()
-encodeIO e s = do
-  putStrLn (show e)
-  let re1 = doRotation e
-  let c1 = cipher re1 'A'
-  putStrLn (show re1)
-  let re2 = doRotation re1
-  let c2 = cipher re2 'A'
-  putStrLn (show re2)
-  let re3 = doRotation re2
-  let c3 = cipher re3 'A'
-  putStrLn (show re3)
-  let es = c1:c2:c3:[]
-  putStrLn es
+encode :: String -> EnigmaState String
+encode s = mapM encodeCharST s
