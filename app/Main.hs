@@ -9,35 +9,10 @@ e :: Enigma
 -- 1,1,1
 e = createEnigma ["EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
 
-r1 = rotorFromStringMap "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-r2 = rotorFromStringMap "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-rfl = rotorFromStringMap "YRUHQSLDPXNGOKMIEBFZCWVJAT"
-
-
 main :: IO ()
 main = do
-  let r3 = rotorFromStringMap "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-  let r2 = rotorFromStringMap "EKMFLGDQVZNTOWYHXUSPAIBRCJ"
-  let o = 3
-  let r1 = r3 {
-    offset = o
-  }
-  putStrLn (show r1)
-  putStrLn (show rfl)
-  let c = 0
-  let c1 = cipherWithRotorRightToLeft c r1
-  let c2 = cipherWithRotorRightToLeft (c1) r2
-  let c3 = cipherWithRotorRightToLeft (c2) r3
-  let c4 = cipherWithRotorRightToLeft (c3) rfl
-  let c5 = cipherWithRotorLeftToRight (c4) r3
-  let c6 = cipherWithRotorLeftToRight (c5) r2
-  let c7 = cipherWithRotorLeftToRight (c6) r1
-  let c8 = c7
-  putStrLn (show (c,c1,c2,c3,c4,c5,c6,c7,c8))
-  putStrLn [(positionToLetter c8)]
-  -- let res = encode e "AAA"
-  -- print res
-
+  let s = evalState (encode "AAAA") e
+  putStrLn s
 
 {-
 First Encode 'A'

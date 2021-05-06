@@ -9,9 +9,6 @@ import Debug.Trace
 alphabetC :: String
 alphabetC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-swap :: (a,b) -> (b,a)
-swap (a,b) = (b,a)
-
 letterToPosition :: Char -> Int
 letterToPosition c =
   case elemIndex c alphabetC of
