@@ -65,20 +65,17 @@ addWithRollover value offset max = do
   if nv < 0 then max - 1 else
     if nv < max then nv else nv - max
 
-cipherWithRotor :: Int -> Rotor -> Int
-cipherWithRotor p r = do
-  let o = offset r
-  let np = addWithRollover p o 26
-  case Map.lookup np (wiring r) of
-    Just i -> i
-    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+subtractWithRollover :: Int -> Int -> Int -> Int
+subtractWithRollover value offset max = do
+  let nv = value - offset
+  if nv < 0 then max - (0 - nv) else nv
 
 cipherWithRotorRightToLeft :: Int -> Rotor -> Int
 cipherWithRotorRightToLeft p r = do
   let o = offset r
   let np = addWithRollover p o 26  
   case Map.lookup np (wiring r) of
-    Just i -> i
+    Just i -> subtractWithRollover i o 26
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
 
 keyFromValue :: Int -> Map.Map Int Int -> Maybe Int
@@ -93,7 +90,7 @@ cipherWithRotorLeftToRight p r = do
   let o = offset r
   let np = addWithRollover p o 26  
   case keyFromValue np (wiring r) of
-    Just i -> i
+    Just i -> subtractWithRollover i o 26
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
 
 
@@ -108,9 +105,9 @@ cipher :: Enigma -> Char -> Char
 cipher e c = do
   let r = rotors e
   let p = letterToPosition c
-  let fw = foldl cipherWithRotor p r
-  let reflected = cipherWithRotor fw (reflector e)
-  let bw = foldl cipherWithRotor reflected (reverse r)
+  let fw = foldl cipherWithRotorRightToLeft p r
+  let reflected = cipherWithRotorRightToLeft fw (reflector e)
+  let bw = foldl cipherWithRotorLeftToRight reflected (reverse r)
   positionToLetter bw
 
 doRotation :: Enigma -> Enigma
