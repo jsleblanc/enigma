@@ -4,8 +4,11 @@ module Lib (
   rotor_I,
   rotor_II,
   rotor_III,
+  rotor_IV,
+  rotor_V,
   reflector_A,
   reflector_B,
+  reflector_C,
   createEnigmaWithRotors,
   encode
 ) where
@@ -66,12 +69,25 @@ rotor_III startPosition = r {
   turnover = 21 -- V
 } where r = createRotor "BDFHJLCPRTXVZNYEIWGAKMUSQO" startPosition
 
+rotor_IV :: Int -> Rotor
+rotor_IV startPosition = r {
+  turnover = 9 -- J
+} where r = createRotor "ESOVPZJAYQUIRHXLNFTGKDCMWB" startPosition
+
+rotor_V :: Int -> Rotor
+rotor_V startPosition = r {
+  turnover = 25 -- Z
+} where r = createRotor "VZBRGITYUPSDNHLXAWMJQOFECK" startPosition
+
+
 reflector_A :: Rotor
 reflector_A = createRotor "EJMZALYXVBWFCRQUONTSPIKHGD" 0
 
 reflector_B :: Rotor
 reflector_B = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
 
+reflector_C :: Rotor
+reflector_C = createRotor "FVPJIAOYEDRZXWGCTKUQSBNMHL" 0
 
 data Enigma = Enigma {
   rotors :: [Rotor],

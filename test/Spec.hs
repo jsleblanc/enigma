@@ -66,6 +66,11 @@ cipheredExample_3_Test = do
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "UOTGRLFGERCPELTTVTJBGHVWPY" result
 
+cipheredExample_4_Test :: Assertion
+cipheredExample_4_Test = do
+  let plainText = take 52 (repeat 'A')
+  let result = evalState (encode plainText) sut
+  assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "UOTGRLFGERCPELTTVTJBGHVWPYEUMJYTVIZFNVFWYFJVOBTTNQRU" result
 
 singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
 singleCharacterNeverEncodesToItselfProperty (AlphabetChar c) = True ==> do
@@ -98,6 +103,7 @@ unitTests = testGroup "Unit tests"
       testCase "cipheredExample_1_Test" cipheredExample_1_Test
     , testCase "cipheredExample_2_Test" cipheredExample_2_Test
     , testCase "cipheredExample_3_Test" cipheredExample_3_Test
+    , testCase "cipheredExample_4_Test" cipheredExample_4_Test
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"
