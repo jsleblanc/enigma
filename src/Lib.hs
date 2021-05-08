@@ -151,7 +151,8 @@ doRotation e = do
   let ne = e {
     rotors = l:rs
   }
-  traceShow b $ ne
+  -- traceShow b $ ne
+  ne
 
 type EnigmaState = State Enigma
 
@@ -161,7 +162,7 @@ encodeCharST c = do
   let rotatedEnigma = doRotation enigmaState
   let encodedChar = cipher rotatedEnigma c
   put rotatedEnigma
-  get >>= traceShowM
+  -- get >>= traceShowM
   return encodedChar
 
 encode :: String -> EnigmaState String
