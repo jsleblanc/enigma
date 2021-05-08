@@ -179,9 +179,17 @@ doRotationRotors [] = []
 doRotationRotors rotors = r2:rnext
   where
     (r1:rs) = rotors
-    (propagate,r2) = rotateRotor r1
-    -- p2 = traceShow propagate $ propagate
-    rnext = if propagate then doRotationRotors rs else rs
+    (propagate,r2) = rotateRotor r1 -- always advance first rotor
+    rnext = propagateRotation propagate rs
+
+propagateRotation :: Bool -> [Rotor] -> [Rotor]
+propagateRotation _ [] = []
+propagateRotation b rotors = r2:rnext
+  where
+    (r1:rs) = rotors
+    advance = shouldAdvanceNextRotor r1
+    (advanceNext,r2) = if (b || advance) then rotateRotor r1 else (False,r1)
+    rnext = propagateRotation advanceNext rs
 
 type EnigmaState = State Enigma
 

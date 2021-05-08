@@ -22,7 +22,7 @@ e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B
 
 main :: IO ()
 main = do
-  let p = take 8 (repeat 'A')
+  let p = take 9 (repeat 'A')
   let s = evalState (encode p) e1
   putStrLn s
 

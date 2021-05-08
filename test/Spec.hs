@@ -84,9 +84,9 @@ cipheredExample_double_stepping = do
   let r2 = rotor_II 3
   let r3 = rotor_I 14
   let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B
-  let plainText = take 8 (repeat 'A')
+  let plainText = take 9 (repeat 'A')
   let result = evalState (encode plainText) sut
-  assertEqual "Example did not encode to expected value. Rotor double stepping." "ULMHJCJJ" result
+  assertEqual "Example did not encode to expected value. Rotor double stepping." "ULMHJCJJC" result
 
 singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
 singleCharacterNeverEncodesToItselfProperty (AlphabetChar c) = True ==> do
