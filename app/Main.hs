@@ -14,15 +14,17 @@ e = createEnigmaWithRotors [r3, r2, r1] rfl emptyPlugboard
     rfl = reflector_B
 
 e1 :: Enigma
-e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
+e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B pb
   where
-    r1 = rotor_III 10
-    r2 = rotor_II 3
-    r3 = rotor_I 14
+    r1 = rotor_V 0
+    r2 = rotor_I 16
+    r3 = rotor_III 11
+    pb = createPlugboard [('B','Q'),('C','R'),('D','I'),('E','J'),('K','W'),('M','T'),('O','S'),('P','X'),('U','Z'),('G','H')]
 
 main :: IO ()
 main = do
-  let p = take 9 (repeat 'A')
+  -- let p = take 9 (repeat 'A')
+  let p = "SJNKSUFIOUXKOXOTFRLZZYPRCBKHFYHRFQUARFKCQKRGNWSPVXJHMPQRPWHOFHCAVUIUPUEZOAAPFREBQFXVKYXGZNWBBSSGACKITASUBOQISTZCQZTZUHLBDMZRSDANLGVDXPFWIORUOJNKWFKSIITMXLHYQIEGSQNCHIOOLNWCJBDBHBZHIRJO"
   let s = evalState (encode p) e1
   putStrLn s
 
