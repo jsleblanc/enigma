@@ -1,8 +1,11 @@
 module Lib (
   Rotor,
   Enigma,
-  createRotor,
-  createEnigma,
+  rotor_I,
+  rotor_II,
+  rotor_III,
+  reflector_A,
+  reflector_B,
   createEnigmaWithRotors,
   encode
 ) where
@@ -36,15 +39,39 @@ rotorFromStringMap s = r
     pairs = map (\(i,c) -> (i,letterToPosition c)) indexedString
     r = Rotor {
       wiring = Map.fromList pairs,
-      offset = 0
+      offset = 0,
+      turnover = 0
     }
 
 type Offset = Int
 
 data Rotor = Rotor {
   wiring :: Map.Map Int Int,
-  offset :: Offset
+  offset :: Offset,
+  turnover :: Int
 } deriving Show
+
+rotor_I :: Int -> Rotor
+rotor_I startPosition = r {
+  turnover = 16 --Q
+} where r = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" startPosition
+
+rotor_II :: Int -> Rotor
+rotor_II startPosition = r {
+  turnover = 4 --E
+} where r = createRotor "AJDKSIRUXBLHWTMCQGZNPYFVOE" startPosition
+
+rotor_III :: Int -> Rotor
+rotor_III startPosition = r {
+  turnover = 21 -- V
+} where r = createRotor "BDFHJLCPRTXVZNYEIWGAKMUSQO" startPosition
+
+reflector_A :: Rotor
+reflector_A = createRotor "EJMZALYXVBWFCRQUONTSPIKHGD" 0
+
+reflector_B :: Rotor
+reflector_B = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
+
 
 data Enigma = Enigma {
   rotors :: [Rotor],

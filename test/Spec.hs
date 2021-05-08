@@ -7,18 +7,31 @@ import Test.Tasty.HUnit
 import Lib
 
 sut :: Enigma
-sut = createEnigma ["BDFHJLCPRTXVZNYEIWGAKMUSQO","AJDKSIRUXBLHWTMCQGZNPYFVOE","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
+sut = 
+  createEnigmaWithRotors [r3, r2, r1] rfl
+    where
+      r1 = rotor_I 0
+      r2 = rotor_I 0
+      r3 = rotor_I 0
+      rfl = reflector_B
 
 enigmaAllRotor1 :: Enigma
-enigmaAllRotor1 = createEnigma ["EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
+enigmaAllRotor1 = 
+  createEnigmaWithRotors [r3, r2, r1] rfl
+    where
+      r1 = rotor_I 0
+      r2 = rotor_I 0
+      r3 = rotor_I 0
+      rfl = reflector_B
 
 enigmaAllRotor1_StartFirstRotorAtZ :: Enigma
-enigmaAllRotor1_StartFirstRotorAtZ = createEnigmaWithRotors [r3, r2, r1] rfl
-  where
-    r1 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 0
-    r2 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 0
-    r3 = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" 25
-    rfl = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
+enigmaAllRotor1_StartFirstRotorAtZ = 
+  createEnigmaWithRotors [r3, r2, r1] rfl
+    where
+      r1 = rotor_I 0
+      r2 = rotor_I 0
+      r3 = rotor_I 25
+      rfl = reflector_B
 
 genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']

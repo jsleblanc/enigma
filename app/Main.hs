@@ -6,12 +6,17 @@ import Data.List
 import qualified Data.Map as Map
 
 e :: Enigma
--- 1,1,1
-e = createEnigma ["EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ","EKMFLGDQVZNTOWYHXUSPAIBRCJ"] "YRUHQSLDPXNGOKMIEBFZCWVJAT"
+e = createEnigmaWithRotors [r3, r2, r1] rfl
+  where
+    r1 = rotor_I 0
+    r2 = rotor_I 0
+    r3 = rotor_I 25
+    rfl = reflector_B
 
 main :: IO ()
 main = do
-  let s = evalState (encode "AAAAAAAAAAAAAAA") e
+  let p = take 26 (repeat 'A')
+  let s = evalState (encode p) e
   putStrLn s
 
 {-
