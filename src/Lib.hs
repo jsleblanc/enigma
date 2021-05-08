@@ -154,7 +154,7 @@ doRotationEnigma e = do
 
 doRotationRotors :: [Rotor] -> [Rotor]
 doRotationRotors [] = []
-doRotationR rotors = r2:rnext
+doRotationRotors rotors = r2:rnext
   where
     (r1:rs) = rotors
     (propagate,r2) = rotateRotor r1
