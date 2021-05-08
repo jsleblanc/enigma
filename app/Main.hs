@@ -10,7 +10,7 @@ e = createEnigmaWithRotors [r3, r2, r1] rfl
   where
     r1 = rotor_I 0
     r2 = rotor_I 0
-    r3 = rotor_I 25
+    r3 = rotor_I 0
     rfl = reflector_B
 
 main :: IO ()

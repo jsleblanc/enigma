@@ -132,7 +132,7 @@ rotateRotor r = do
   let nr = r {
     offset = addWithRollover o 1 26
   }
-  let passedTurnover = (o - 1) == turnover r
+  let passedTurnover = o == turnover r
   (passedTurnover, nr)
 
 cipher :: Enigma -> Char -> Char
@@ -144,22 +144,28 @@ cipher e c = do
   let bw = foldl cipherWithRotorLeftToRight reflected (reverse r)
   positionToLetter bw
 
-doRotation :: Enigma -> Enigma
-doRotation e = do
-  let (r:rs) = rotors e
-  let (b,l) = rotateRotor r
+doRotationEnigma :: Enigma -> Enigma
+doRotationEnigma e = do
   let ne = e {
-    rotors = l:rs
+    rotors = doRotationRotors (rotors e)
   }
   -- traceShow b $ ne
   ne
+
+doRotationRotors :: [Rotor] -> [Rotor]
+doRotationRotors [] = []
+doRotationR rotors = r2:rnext
+  where
+    (r1:rs) = rotors
+    (propagate,r2) = rotateRotor r1
+    rnext = if propagate then doRotationRotors rs else rs
 
 type EnigmaState = State Enigma
 
 encodeCharST :: Char -> EnigmaState Char
 encodeCharST c = do
   enigmaState <- get
-  let rotatedEnigma = doRotation enigmaState
+  let rotatedEnigma = doRotationEnigma enigmaState
   let encodedChar = cipher rotatedEnigma c
   put rotatedEnigma
   -- get >>= traceShowM
