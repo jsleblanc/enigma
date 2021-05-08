@@ -8,30 +8,27 @@ import Lib
 
 enigmaAllRotor1 :: Enigma
 enigmaAllRotor1 = 
-  createEnigmaWithRotors [r3, r2, r1] rfl
+  createEnigmaWithRotors [r3, r2, r1] reflector_B
     where
       r1 = rotor_I 0
       r2 = rotor_I 0
       r3 = rotor_I 0
-      rfl = reflector_B
 
 enigmaAllRotor1_StartFirstRotorAtZ :: Enigma
 enigmaAllRotor1_StartFirstRotorAtZ = 
-  createEnigmaWithRotors [r3, r2, r1] rfl
+  createEnigmaWithRotors [r3, r2, r1] reflector_B
     where
       r1 = rotor_I 0
       r2 = rotor_I 0
       r3 = rotor_I 25
-      rfl = reflector_B
 
 enigmaConfig2 :: Enigma
 enigmaConfig2 = 
-  createEnigmaWithRotors [r3, r2, r1] rfl
+  createEnigmaWithRotors [r3, r2, r1] reflector_B
     where
       r1 = rotor_III 0
       r2 = rotor_II 0
       r3 = rotor_I 0
-      rfl = reflector_B
       
 genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']
@@ -81,6 +78,15 @@ cipheredExample_5_Test = do
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "FTZMGISXIPJWGDNJJCOQTYRIGDMXFIESRWZGTOIUIEKKDCSHTPYO" result
 
+cipheredExample_double_stepping :: Assertion
+cipheredExample_double_stepping = do
+  let r1 = rotor_III 10
+  let r2 = rotor_II 3
+  let r3 = rotor_I 14
+  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B
+  let plainText = take 8 (repeat 'A')
+  let result = evalState (encode plainText) sut
+  assertEqual "Example did not encode to expected value. Rotor double stepping." "ULMHJCJJ" result
 
 singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
 singleCharacterNeverEncodesToItselfProperty (AlphabetChar c) = True ==> do
@@ -118,6 +124,7 @@ unitTests = testGroup "Unit tests"
     , testCase "cipheredExample_3_Test" cipheredExample_3_Test
     , testCase "cipheredExample_4_Test" cipheredExample_4_Test
     , testCase "cipheredExample_5_Test" cipheredExample_5_Test
+    , testCase "cipheredExample_double_stepping" cipheredExample_double_stepping
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

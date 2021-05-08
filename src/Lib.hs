@@ -52,7 +52,9 @@ data Rotor = Rotor {
   wiring :: Map.Map Int Int,
   offset :: Offset,
   turnover :: Int
-} deriving Show
+} -- deriving Show
+
+instance Show Rotor where show r = show (offset r) ++ " (" ++ show (turnover r) ++ ")"
 
 rotor_I :: Int -> Rotor
 rotor_I startPosition = r {
@@ -142,14 +144,19 @@ cipherWithRotorLeftToRight p r = do
     Just i -> subtractWithRollover i o 26
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
 
+shouldAdvanceNextRotor :: Rotor -> Bool
+shouldAdvanceNextRotor r = do
+  let o = offset r
+  o == turnover r
+
 rotateRotor :: Rotor -> (Bool, Rotor)
 rotateRotor r = do
+  let advance = shouldAdvanceNextRotor r
   let o = offset r
   let nr = r {
     offset = addWithRollover o 1 26
   }
-  let passedTurnover = o == turnover r
-  (passedTurnover, nr)
+  (advance, nr)
 
 cipher :: Enigma -> Char -> Char
 cipher e c = do
@@ -165,7 +172,6 @@ doRotationEnigma e = do
   let ne = e {
     rotors = doRotationRotors (rotors e)
   }
-  -- traceShow b $ ne
   ne
 
 doRotationRotors :: [Rotor] -> [Rotor]
@@ -174,6 +180,7 @@ doRotationRotors rotors = r2:rnext
   where
     (r1:rs) = rotors
     (propagate,r2) = rotateRotor r1
+    -- p2 = traceShow propagate $ propagate
     rnext = if propagate then doRotationRotors rs else rs
 
 type EnigmaState = State Enigma

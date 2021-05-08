@@ -13,10 +13,17 @@ e = createEnigmaWithRotors [r3, r2, r1] rfl
     r3 = rotor_I 0
     rfl = reflector_B
 
+e1 :: Enigma
+e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B
+  where
+    r1 = rotor_III 10
+    r2 = rotor_II 3
+    r3 = rotor_I 14
+
 main :: IO ()
 main = do
-  let p = take 26 (repeat 'A')
-  let s = evalState (encode p) e
+  let p = take 8 (repeat 'A')
+  let s = evalState (encode p) e1
   putStrLn s
 
 {-
