@@ -10,6 +10,8 @@ module Lib (
   reflector_B,
   reflector_C,
   createEnigmaWithRotors,
+  createPlugboard,
+  emptyPlugboard,
   encode
 ) where
 
@@ -81,7 +83,6 @@ rotor_V startPosition = r {
   turnover = 25 -- Z
 } where r = createRotor "VZBRGITYUPSDNHLXAWMJQOFECK" startPosition
 
-
 reflector_A :: Rotor
 reflector_A = createRotor "EJMZALYXVBWFCRQUONTSPIKHGD" 0
 
@@ -91,23 +92,42 @@ reflector_B = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
 reflector_C :: Rotor
 reflector_C = createRotor "FVPJIAOYEDRZXWGCTKUQSBNMHL" 0
 
-data Enigma = Enigma {
-  rotors :: [Rotor],
-  reflector :: Rotor
+
+data Plugboard = Plugboard {
+  letterSwaps :: Map.Map Int Int
 } deriving Show
 
--- Put Rotors in right-to-left order; rightmost position is 1, leftmost is 3 (or 4), reflector is in the left-most position
-createEnigma :: [String] -> String -> Enigma
-createEnigma rs rf =
-  createEnigmaWithRotors rotors reflector
-  where
-    rotors = map rotorFromStringMap rs
-    reflector = rotorFromStringMap rf
 
-createEnigmaWithRotors :: [Rotor] -> Rotor -> Enigma
-createEnigmaWithRotors rs rf = Enigma {
+swap :: (a,a) -> (a,a)
+swap (x,y) = (y,x)
+
+createPlugboard :: [(Char,Char)] -> Plugboard
+createPlugboard [] = Plugboard {
+  letterSwaps = Map.empty
+}
+createPlugboard pairs = Plugboard {
+  letterSwaps = Map.fromList mappings
+} where
+  indexFst = map (letterToPosition . fst) pairs
+  indexSnd = map (letterToPosition . snd) pairs
+  indexedPairs = zip indexFst indexSnd
+  swappedIndexedPairs = map swap indexedPairs
+  mappings = indexedPairs ++ swappedIndexedPairs
+
+emptyPlugboard :: Plugboard
+emptyPlugboard = createPlugboard []
+
+data Enigma = Enigma {
+  rotors :: [Rotor],
+  reflector :: Rotor,
+  plugboard :: Plugboard
+} deriving Show
+
+createEnigmaWithRotors :: [Rotor] -> Rotor -> Plugboard -> Enigma
+createEnigmaWithRotors rs rf pb = Enigma {
   rotors = rs,
-  reflector = rf
+  reflector = rf,
+  plugboard = pb
 }
 
 addWithRollover :: Int -> Offset -> Int -> Int
@@ -158,14 +178,24 @@ rotateRotor r = do
   }
   (advance, nr)
 
+swapPlugboard :: Int -> Plugboard -> Int
+swapPlugboard c pb = do
+  let m = letterSwaps pb
+  case Map.lookup c m of
+    Just i -> i
+    Nothing -> c
+
 cipher :: Enigma -> Char -> Char
 cipher e c = do
-  let r = rotors e
+  let pb = plugboard e
+  let r = rotors e  
   let p = letterToPosition c
-  let fw = foldl cipherWithRotorRightToLeft p r
+  let pbSwap1 = swapPlugboard p pb
+  let fw = foldl cipherWithRotorRightToLeft pbSwap1 r
   let reflected = cipherWithRotorRightToLeft fw (reflector e)
   let bw = foldl cipherWithRotorLeftToRight reflected (reverse r)
-  positionToLetter bw
+  let pbSwap2 = swapPlugboard bw pb
+  positionToLetter pbSwap2
 
 doRotationEnigma :: Enigma -> Enigma
 doRotationEnigma e = do

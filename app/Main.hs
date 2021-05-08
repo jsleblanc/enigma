@@ -6,7 +6,7 @@ import Data.List
 import qualified Data.Map as Map
 
 e :: Enigma
-e = createEnigmaWithRotors [r3, r2, r1] rfl
+e = createEnigmaWithRotors [r3, r2, r1] rfl emptyPlugboard
   where
     r1 = rotor_I 0
     r2 = rotor_I 0
@@ -14,7 +14,7 @@ e = createEnigmaWithRotors [r3, r2, r1] rfl
     rfl = reflector_B
 
 e1 :: Enigma
-e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B
+e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
   where
     r1 = rotor_III 10
     r2 = rotor_II 3

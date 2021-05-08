@@ -8,7 +8,7 @@ import Lib
 
 enigmaAllRotor1 :: Enigma
 enigmaAllRotor1 = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B
+  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
     where
       r1 = rotor_I 0
       r2 = rotor_I 0
@@ -16,7 +16,7 @@ enigmaAllRotor1 =
 
 enigmaAllRotor1_StartFirstRotorAtZ :: Enigma
 enigmaAllRotor1_StartFirstRotorAtZ = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B
+  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
     where
       r1 = rotor_I 0
       r2 = rotor_I 0
@@ -24,7 +24,7 @@ enigmaAllRotor1_StartFirstRotorAtZ =
 
 enigmaConfig2 :: Enigma
 enigmaConfig2 = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B
+  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
     where
       r1 = rotor_III 0
       r2 = rotor_II 0
@@ -83,10 +83,22 @@ cipheredExample_double_stepping = do
   let r1 = rotor_III 10
   let r2 = rotor_II 3
   let r3 = rotor_I 14
-  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B
+  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
   let plainText = take 9 (repeat 'A')
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. Rotor double stepping." "ULMHJCJJC" result
+
+cipheredExample_plugboard :: Assertion
+cipheredExample_plugboard = do
+  let r1 = rotor_I 0
+  let r2 = rotor_I 0
+  let r3 = rotor_I 0
+  let pb = createPlugboard [('A','O'),('R','Z'),('Q','B'),('U','E')]
+  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B pb
+  let plainText = take 8 (repeat 'A')
+  let result = evalState (encode plainText) sut
+  assertEqual "Example did not encode to expected value. Rotor double stepping." "KOBSPCRC" result
+  
 
 singleCharacterNeverEncodesToItselfProperty :: AlphabetChar -> Property
 singleCharacterNeverEncodesToItselfProperty (AlphabetChar c) = True ==> do
@@ -125,6 +137,7 @@ unitTests = testGroup "Unit tests"
     , testCase "cipheredExample_4_Test" cipheredExample_4_Test
     , testCase "cipheredExample_5_Test" cipheredExample_5_Test
     , testCase "cipheredExample_double_stepping" cipheredExample_double_stepping
+    , testCase "cipheredExample_plugboard" cipheredExample_plugboard
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"
