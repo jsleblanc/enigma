@@ -132,7 +132,7 @@ rotateRotor r = do
   let nr = r {
     offset = addWithRollover o 1 26
   }
-  let passedTurnover = (o + 1) == turnover r
+  let passedTurnover = (o - 1) == turnover r
   (passedTurnover, nr)
 
 cipher :: Enigma -> Char -> Char
@@ -148,9 +148,10 @@ doRotation :: Enigma -> Enigma
 doRotation e = do
   let (r:rs) = rotors e
   let (b,l) = rotateRotor r
-  e {
+  let ne = e {
     rotors = l:rs
   }
+  traceShow b $ ne
 
 type EnigmaState = State Enigma
 
