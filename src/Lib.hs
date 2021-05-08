@@ -126,12 +126,14 @@ cipherWithRotorLeftToRight p r = do
     Just i -> subtractWithRollover i o 26
     Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
 
-rotateRotor :: Rotor -> Rotor
+rotateRotor :: Rotor -> (Bool, Rotor)
 rotateRotor r = do
   let o = offset r
-  r {
+  let nr = r {
     offset = addWithRollover o 1 26
   }
+  let passedTurnover = (o + 1) == turnover r
+  (passedTurnover, nr)
 
 cipher :: Enigma -> Char -> Char
 cipher e c = do
@@ -145,7 +147,7 @@ cipher e c = do
 doRotation :: Enigma -> Enigma
 doRotation e = do
   let (r:rs) = rotors e
-  let l = rotateRotor r
+  let (b,l) = rotateRotor r
   e {
     rotors = l:rs
   }
@@ -158,6 +160,7 @@ encodeCharST c = do
   let rotatedEnigma = doRotation enigmaState
   let encodedChar = cipher rotatedEnigma c
   put rotatedEnigma
+  get >>= traceShowM
   return encodedChar
 
 encode :: String -> EnigmaState String
