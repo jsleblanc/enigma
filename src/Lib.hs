@@ -93,9 +93,9 @@ reflectorC :: Rotor
 reflectorC = createRotor "FVPJIAOYEDRZXWGCTKUQSBNMHL" 0
 
 
-data Plugboard = Plugboard {
-  letterSwaps :: Map.Map Int Int
-} deriving Show
+newtype Plugboard
+  = Plugboard {letterSwaps :: Map.Map Int Int}
+  deriving Show
 
 
 swap :: (a,a) -> (a,a)
@@ -131,15 +131,15 @@ createEnigmaWithRotors rs rf pb = Enigma {
 }
 
 addWithRollover :: Int -> Offset -> Int -> Int
-addWithRollover value offset max = do
-  let nv = value + offset
-  if nv < 0 then max - 1 else
-    if nv < max then nv else nv - max
+addWithRollover value ofs maxv = do
+  let nv = value + ofs
+  if nv < 0 then maxv - 1 else
+    if nv < maxv then nv else nv - maxv
 
 subtractWithRollover :: Int -> Offset -> Int -> Int
-subtractWithRollover value offset max = do
-  let nv = value - offset
-  if nv < 0 then max - (0 - nv) else nv
+subtractWithRollover value ofs maxv = do
+  let nv = value - ofs
+  if nv < 0 then maxv - negate nv else nv
 
 cipherWithRotorRightToLeft :: Int -> Rotor -> Int
 cipherWithRotorRightToLeft p r = do
@@ -147,7 +147,7 @@ cipherWithRotorRightToLeft p r = do
   let np = addWithRollover p o 26  
   case Map.lookup np (wiring r) of
     Just i -> subtractWithRollover i o 26
-    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+    Nothing -> error ("Invalid rotor index " ++ show np ++ " offset " ++ show o)
 
 keyFromValue :: Int -> Map.Map Int Int -> Maybe Int
 keyFromValue value m = do
@@ -162,7 +162,7 @@ cipherWithRotorLeftToRight p r = do
   let np = addWithRollover p o 26  
   case keyFromValue np (wiring r) of
     Just i -> subtractWithRollover i o 26
-    Nothing -> error ("Invalid rotor index " ++ (show np) ++ " offset " ++ (show o))
+    Nothing -> error ("Invalid rotor index " ++ show np ++ " offset " ++ show o)
 
 shouldAdvanceNextRotor :: Rotor -> Bool
 shouldAdvanceNextRotor r = do
@@ -206,19 +206,19 @@ doRotationEnigma e = do
 
 doRotationRotors :: [Rotor] -> [Rotor]
 doRotationRotors [] = []
-doRotationRotors rotors = r2:rnext
+doRotationRotors rotorsList = r2:rnext
   where
-    (r1:rs) = rotors
+    (r1:rs) = rotorsList
     (propagate,r2) = rotateRotor r1 -- always advance first rotor
     rnext = propagateRotation propagate rs
 
 propagateRotation :: Bool -> [Rotor] -> [Rotor]
 propagateRotation _ [] = []
-propagateRotation b rotors = r2:rnext
+propagateRotation b rotorsList = r2:rnext
   where
-    (r1:rs) = rotors
+    (r1:rs) = rotorsList
     advance = shouldAdvanceNextRotor r1
-    (advanceNext,r2) = if (b || advance) then rotateRotor r1 else (False,r1)
+    (advanceNext,r2) = if b || advance then rotateRotor r1 else (False,r1)
     rnext = propagateRotation advanceNext rs
 
 type EnigmaState = State Enigma
@@ -233,4 +233,4 @@ encodeCharST c = do
   return encodedChar
 
 encode :: String -> EnigmaState String
-encode s = mapM encodeCharST s
+encode = mapM encodeCharST
