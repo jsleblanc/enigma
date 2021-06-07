@@ -19,6 +19,7 @@ import Control.Monad (mapM)
 import Control.Monad.State (State, get, put, modify, evalState, runState)
 import Data.List
 import Data.Maybe (fromMaybe)
+import Data.Bifunctor (second)
 import qualified Data.Map as Map
 import Debug.Trace
 
@@ -42,7 +43,7 @@ rotorFromStringMap :: String -> Rotor
 rotorFromStringMap s = r
   where
     indexedString = zip [0..] s
-    pairs = map (\(i,c) -> (i,letterToPosition c)) indexedString
+    pairs = map (Data.Bifunctor.second letterToPosition) indexedString
     r = Rotor {
       wiring = Map.fromList pairs,
       offset = 0,
