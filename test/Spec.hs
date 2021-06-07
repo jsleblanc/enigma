@@ -1,4 +1,3 @@
-import Data.Monoid
 import Control.Monad.State
 -- import Utils
 import Test.Tasty
@@ -8,27 +7,27 @@ import Lib
 
 enigmaAllRotor1 :: Enigma
 enigmaAllRotor1 = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
+  createEnigmaWithRotors [r3, r2, r1] reflectorB emptyPlugboard
     where
-      r1 = rotor_I 0
-      r2 = rotor_I 0
-      r3 = rotor_I 0
+      r1 = rotorI 0
+      r2 = rotorI 0
+      r3 = rotorI 0
 
 enigmaAllRotor1_StartFirstRotorAtZ :: Enigma
 enigmaAllRotor1_StartFirstRotorAtZ = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
+  createEnigmaWithRotors [r3, r2, r1] reflectorB emptyPlugboard
     where
-      r1 = rotor_I 0
-      r2 = rotor_I 0
-      r3 = rotor_I 25
+      r1 = rotorI 0
+      r2 = rotorI 0
+      r3 = rotorI 25
 
 enigmaConfig2 :: Enigma
 enigmaConfig2 = 
-  createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
+  createEnigmaWithRotors [r3, r2, r1] reflectorB emptyPlugboard
     where
-      r1 = rotor_III 0
-      r2 = rotor_II 0
-      r3 = rotor_I 0
+      r1 = rotorIII 0
+      r2 = rotorII 0
+      r3 = rotorI 0
       
 genAlphabetChar :: Gen Char
 genAlphabetChar = elements ['A'..'Z']
@@ -60,42 +59,42 @@ cipheredExample_2_Test = do
 cipheredExample_3_Test :: Assertion
 cipheredExample_3_Test = do
   let sut = enigmaAllRotor1
-  let plainText = take 26 (repeat 'A')
+  let plainText = replicate 26 'A'
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "UOTGRLFGERCPELTTVTJBGHVWPY" result
 
 cipheredExample_4_Test :: Assertion
 cipheredExample_4_Test = do
   let sut = enigmaAllRotor1
-  let plainText = take 52 (repeat 'A')
+  let plainText = replicate 52 'A'
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "UOTGRLFGERCPELTTVTJBGHVWPYEUMJYTVIZFNVFWYFJVOBTTNQRU" result
 
 cipheredExample_5_Test :: Assertion
 cipheredExample_5_Test = do
   let sut = enigmaConfig2
-  let plainText = take 52 (repeat 'A')
+  let plainText = replicate 52 'A'
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. 2nd rotor should have rotated once." "FTZMGISXIPJWGDNJJCOQTYRIGDMXFIESRWZGTOIUIEKKDCSHTPYO" result
 
-cipheredExample_double_stepping :: Assertion
-cipheredExample_double_stepping = do
-  let r1 = rotor_III 10
-  let r2 = rotor_II 3
-  let r3 = rotor_I 14
-  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B emptyPlugboard
-  let plainText = take 9 (repeat 'A')
+cipheredExampleDoubleStepping :: Assertion
+cipheredExampleDoubleStepping = do
+  let r1 = rotorIII 10
+  let r2 = rotorII 3
+  let r3 = rotorI 14
+  let sut = createEnigmaWithRotors [r3, r2, r1] reflectorB emptyPlugboard
+  let plainText = replicate 9 'A'
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. Rotor double stepping." "ULMHJCJJC" result
 
-cipheredExample_plugboard :: Assertion
-cipheredExample_plugboard = do
-  let r1 = rotor_I 0
-  let r2 = rotor_I 0
-  let r3 = rotor_I 0
+cipheredExamplePlugboard :: Assertion
+cipheredExamplePlugboard = do
+  let r1 = rotorI 0
+  let r2 = rotorI 0
+  let r3 = rotorI 0
   let pb = createPlugboard [('A','O'),('R','Z'),('Q','B'),('U','E')]
-  let sut = createEnigmaWithRotors [r3, r2, r1] reflector_B pb
-  let plainText = take 8 (repeat 'A')
+  let sut = createEnigmaWithRotors [r3, r2, r1] reflectorB pb
+  let plainText = replicate 8 'A'
   let result = evalState (encode plainText) sut
   assertEqual "Example did not encode to expected value. Rotor double stepping." "KOBSPCRC" result
   
@@ -136,8 +135,8 @@ unitTests = testGroup "Unit tests"
     , testCase "cipheredExample_3_Test" cipheredExample_3_Test
     , testCase "cipheredExample_4_Test" cipheredExample_4_Test
     , testCase "cipheredExample_5_Test" cipheredExample_5_Test
-    , testCase "cipheredExample_double_stepping" cipheredExample_double_stepping
-    , testCase "cipheredExample_plugboard" cipheredExample_plugboard
+    , testCase "cipheredExample_double_stepping" cipheredExampleDoubleStepping
+    , testCase "cipheredExample_plugboard" cipheredExamplePlugboard
   ]
 
 qcProps = testGroup "(checked by QuickCheck)"

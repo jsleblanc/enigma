@@ -8,17 +8,17 @@ import qualified Data.Map as Map
 e :: Enigma
 e = createEnigmaWithRotors [r3, r2, r1] rfl emptyPlugboard
   where
-    r1 = rotor_I 0
-    r2 = rotor_I 0
-    r3 = rotor_I 0
-    rfl = reflector_B
+    r1 = rotorI 0
+    r2 = rotorI 0
+    r3 = rotorI 0
+    rfl = reflectorB
 
 e1 :: Enigma
-e1 = createEnigmaWithRotors [r3, r2, r1] reflector_B pb
+e1 = createEnigmaWithRotors [r3, r2, r1] reflectorB pb
   where
-    r1 = rotor_V 0
-    r2 = rotor_I 16
-    r3 = rotor_III 11
+    r1 = rotorV 0
+    r2 = rotorI 16
+    r3 = rotorIII 11
     pb = createPlugboard [('B','Q'),('C','R'),('D','I'),('E','J'),('K','W'),('M','T'),('O','S'),('P','X'),('U','Z'),('G','H')]
 
 main :: IO ()

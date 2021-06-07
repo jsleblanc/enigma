@@ -1,14 +1,14 @@
 module Lib (
   Rotor,
   Enigma,
-  rotor_I,
-  rotor_II,
-  rotor_III,
-  rotor_IV,
-  rotor_V,
-  reflector_A,
-  reflector_B,
-  reflector_C,
+  rotorI,
+  rotorII,
+  rotorIII,
+  rotorIV,
+  rotorV,
+  reflectorA,
+  reflectorB,
+  reflectorC,
   createEnigmaWithRotors,
   createPlugboard,
   emptyPlugboard,
@@ -58,39 +58,39 @@ data Rotor = Rotor {
 
 instance Show Rotor where show r = show (offset r) ++ " (" ++ show (turnover r) ++ ")"
 
-rotor_I :: Int -> Rotor
-rotor_I startPosition = r {
+rotorI :: Int -> Rotor
+rotorI startPosition = r {
   turnover = 16 --Q
 } where r = createRotor "EKMFLGDQVZNTOWYHXUSPAIBRCJ" startPosition
 
-rotor_II :: Int -> Rotor
-rotor_II startPosition = r {
+rotorII :: Int -> Rotor
+rotorII startPosition = r {
   turnover = 4 --E
 } where r = createRotor "AJDKSIRUXBLHWTMCQGZNPYFVOE" startPosition
 
-rotor_III :: Int -> Rotor
-rotor_III startPosition = r {
+rotorIII :: Int -> Rotor
+rotorIII startPosition = r {
   turnover = 21 -- V
 } where r = createRotor "BDFHJLCPRTXVZNYEIWGAKMUSQO" startPosition
 
-rotor_IV :: Int -> Rotor
-rotor_IV startPosition = r {
+rotorIV :: Int -> Rotor
+rotorIV startPosition = r {
   turnover = 9 -- J
 } where r = createRotor "ESOVPZJAYQUIRHXLNFTGKDCMWB" startPosition
 
-rotor_V :: Int -> Rotor
-rotor_V startPosition = r {
+rotorV :: Int -> Rotor
+rotorV startPosition = r {
   turnover = 25 -- Z
 } where r = createRotor "VZBRGITYUPSDNHLXAWMJQOFECK" startPosition
 
-reflector_A :: Rotor
-reflector_A = createRotor "EJMZALYXVBWFCRQUONTSPIKHGD" 0
+reflectorA :: Rotor
+reflectorA = createRotor "EJMZALYXVBWFCRQUONTSPIKHGD" 0
 
-reflector_B :: Rotor
-reflector_B = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
+reflectorB :: Rotor
+reflectorB = createRotor "YRUHQSLDPXNGOKMIEBFZCWVJAT" 0
 
-reflector_C :: Rotor
-reflector_C = createRotor "FVPJIAOYEDRZXWGCTKUQSBNMHL" 0
+reflectorC :: Rotor
+reflectorC = createRotor "FVPJIAOYEDRZXWGCTKUQSBNMHL" 0
 
 
 data Plugboard = Plugboard {
