@@ -18,6 +18,7 @@ module Lib (
 import Control.Monad (mapM)
 import Control.Monad.State (State, get, put, modify, evalState, runState)
 import Data.List
+import Data.Maybe (fromMaybe)
 import qualified Data.Map as Map
 import Debug.Trace
 
@@ -181,9 +182,7 @@ rotateRotor r = do
 swapPlugboard :: Int -> Plugboard -> Int
 swapPlugboard c pb = do
   let m = letterSwaps pb
-  case Map.lookup c m of
-    Just i -> i
-    Nothing -> c
+  Data.Maybe.fromMaybe c (Map.lookup c m)
 
 cipher :: Enigma -> Char -> Char
 cipher e c = do
